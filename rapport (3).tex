@@ -1,0 +1,492 @@
+% =====================================================================
+%  RAPPORT À COMPLÉTER
+%  Examen individuel (Partie B) : projet de science des données
+%  appliqué à la finance. S7 FIN et CI, cours BD & DS, ENCG-2026.
+%
+%  Mode d'emploi
+%  1. Remplacez chaque \acompleter{...} (texte rouge) et chaque
+%     \acel{...} (cellule rouge) par votre contenu. Rien ne doit rester
+%     en rouge dans la version remise. Après chaque compilation, le
+%     journal indique le nombre d'éléments qui restent à compléter.
+%  2. Compilez avec pdfLaTeX (sur Overleaf : compilateur pdfLaTeX).
+%     Compilez deux fois pour mettre à jour les renvois et les citations.
+%  3. Les figures sont cherchées dans ../figures/ puis dans figures/.
+%     Tant qu'une figure manque, un cadre la remplace : le document
+%     compile toujours. Sur Overleaf, créez un dossier figures/ et
+%     téléversez-y vos images.
+%  4. Citations : chaque source de la liste « Références et citations »
+%     a une clé (par exemple lie1). Citez-la dans le texte avec \cite{lie1}.
+%  5. Longueur : celle fixée par l'énoncé. Les lignes qui commencent
+%     par % sont des aides : vous pouvez les supprimer.
+%  6. Caractères spéciaux : écrivez \_ pour un tiret bas (par exemple
+%     \texttt{n\_estimators}), \% pour un pourcentage, \& pour &.
+%  7. Page de garde : placez le logo officiel de l'ENCG Settat, nommé
+%     logo_encg_settat.png, à côté de rapport.tex (ou dans figures/).
+%     Tant qu'il manque, un cadre le remplace.
+%  8. Votre photo (format identité) : placez-la à côté de rapport.tex,
+%     nommée photo_etudiant.jpg ou photo_etudiant.png. Tant qu'elle
+%     manque, un cadre la remplace.
+%  9. Lien GitHub : remplacez l'adresse dans la commande \lienDepot
+%     ci-dessous (une seule fois). Il s'affiche sur la page de garde et
+%     en annexe, en rouge tant qu'il n'est pas modifié.
+% 10. Remettez rapport.tex, rapport.pdf, le logo et la photo dans le
+%     dossier rapport/ de votre dépôt CodeApogee-Nom-Groupe.
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[french]{babel}
+\frenchsetup{StandardLists=true}
+\usepackage[margin=1.8cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[labelsep=colon]{caption}
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[hidelinks]{hyperref}
+
+% ========== Mise en page et commandes du gabarit (ne pas modifier) ==========
+\addto\captionsfrench{%
+  \renewcommand{\tablename}{Tableau}%
+  \renewcommand{\refname}{Références et citations}}
+\setlist{itemsep=1pt,topsep=3pt}
+\setlength{\emergencystretch}{2em}
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+  {1.2ex \@plus 0.4ex \@minus 0.2ex}{-1em}{\normalfont\normalsize\bfseries}}
+\makeatother
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\newcounter{nbacompleter}
+\DeclareRobustCommand{\acompleter}[1]{%
+  \stepcounter{nbacompleter}\textcolor{red}{\textit{[À compléter : #1]}}}
+\DeclareRobustCommand{\acel}[1]{%
+  \stepcounter{nbacompleter}\textcolor{red}{\textit{#1}}}
+% \insererfigure{fichier}{légende}{étiquette}
+\newcommand{\insererfigure}[3]{%
+  \begin{figure}[htbp]
+    \centering
+    \IfFileExists{../figures/#1}{\includegraphics[width=0.62\linewidth]{../figures/#1}}{%
+      \IfFileExists{figures/#1}{\includegraphics[width=0.62\linewidth]{figures/#1}}{%
+        \fbox{\parbox[c][2.4cm][c]{0.6\linewidth}{\centering\small
+          Figure à insérer : \texttt{figures/\detokenize{#1}}}}}}
+    \caption{#2}
+    \label{#3}
+  \end{figure}}
+% ---------- VOTRE LIEN GITHUB : remplacez l'adresse ci-dessous ----------
+\newcommand{\lienDepot}{https://github.com/essafi-amineencg/23009142-ESSAFI-Amine.git}
+% -------------------------------------------------------------------------
+\newcommand{\lienParDefaut}{https://github.com/identifiant/CodeApogee-Nom-Groupe}
+\newcommand{\afficherlien}{%
+  \ifx\lienDepot\lienParDefaut
+    \stepcounter{nbacompleter}\textcolor{red}{\expandafter\url\expandafter{\lienDepot}}%
+  \else
+    \expandafter\url\expandafter{\lienDepot}%
+  \fi}
+% Photo de l'étudiant(e) : photo_etudiant.jpg ou photo_etudiant.png
+\newcommand{\photo}[1]{\includegraphics[width=3.5cm,height=4.5cm,keepaspectratio]{#1}}
+\newcommand{\insererphoto}{%
+  \IfFileExists{photo_etudiant.jpg}{\photo{photo_etudiant.jpg}}{%
+    \IfFileExists{photo_etudiant.png}{\photo{photo_etudiant.png}}{%
+      \fbox{\parbox[c][4.5cm][c]{3.5cm}{\centering\small\textcolor{red}{\textit{Photo de\\ l'étudiant(e)}}\\[4pt]
+        \scriptsize\texttt{photo\_etudiant.jpg}}}}}}
+% Logos de la page de garde : déposez les deux fichiers à côté de rapport.tex
+% (ou dans figures/). Modifiez les noms ci-dessous si vos fichiers s'appellent autrement.
+\newcommand{\fichierlogouniv}{logo_universite_hassan1.png}
+\newcommand{\fichierlogo}{logo_encg_settat.png}
+% \chercherimage{fichier}{options}{largeur du cadre}{hauteur du cadre}{texte du cadre}
+\newcommand{\chercherimage}[5]{%
+  \IfFileExists{#1}{\includegraphics[#2]{#1}}{%
+    \IfFileExists{figures/#1}{\includegraphics[#2]{figures/#1}}{%
+      \IfFileExists{../figures/#1}{\includegraphics[#2]{../figures/#1}}{%
+        \fbox{\parbox[c][#4][c]{#3}{\centering\small #5\\[2pt]
+          \tiny\texttt{\detokenize\expandafter{#1}}}}}}}}
+\newcommand{\insererlogouniv}{\chercherimage{\fichierlogouniv}{height=1.9cm}{5.2cm}{1.9cm}{Logo de l'Université Hassan 1\ier}}
+\newcommand{\insererlogo}{\chercherimage{\fichierlogo}{height=2.5cm}{2.5cm}{2.5cm}{Logo de l'ENCG Settat}}
+\AtEndDocument{\ifnum\value{nbacompleter}>0
+  \typeout{ATTENTION : il reste \arabic{nbacompleter} élément(s) à compléter.}\fi}
+% ===========================================================================
+
+\begin{document}
+
+% =====================================================================
+%  PAGE DE GARDE (non comptée dans la longueur du rapport)
+% =====================================================================
+\begin{titlepage}
+  \centering
+  % Logos : Université Hassan 1er à gauche, ENCG Settat à droite
+  \noindent
+  \begin{minipage}[c]{0.5\linewidth}\raggedright\insererlogouniv\end{minipage}%
+  \begin{minipage}[c]{0.5\linewidth}\raggedleft\insererlogo\end{minipage}\par
+  \vspace{0.9cm}
+  {\large Université Hassan 1\ier{} de Settat}\par
+  \vspace{0.2cm}
+  {\Large\bfseries École Nationale de Commerce et de Gestion de Settat}\par
+  \vspace{0.1cm}
+  {\large ENCG Settat}\par
+  \vspace{1.6cm}
+  \rule{\linewidth}{0.8pt}\par
+  \vspace{0.5cm}
+  {\large Cours BD \& DS : examen individuel (Partie B)}\par
+  \vspace{0.3cm}
+  {\Large Rapport de projet de science des données appliqué à la finance}\par
+  \vspace{0.7cm}
+  {\LARGE\bfseries UCI 222 : prédiction de la souscription à un dépôt à terme}\par
+  \vspace{0.5cm}
+  \rule{\linewidth}{0.8pt}\par
+  \vfill
+  \begin{minipage}[c]{0.66\linewidth}
+  \large
+  \begin{tabular}{@{}ll@{}}
+    Réalisé par          & ESSAFI Amine \\[3pt]
+    Code Apogée          & 23009142 \\[3pt]
+    Groupe et filière    & Groupe 2, S7 FIN \\[3pt]
+    Algorithme principal & 14 : gradient boosting (classification) \\[3pt]
+    Enseignant(e)        & Pr. LARHLIMI \\[3pt]
+  \end{tabular}
+  \end{minipage}\hfill
+  \begin{minipage}[c]{0.3\linewidth}
+    \centering\insererphoto
+  \end{minipage}\par
+  \vspace{0.8cm}
+  {\large\textbf{Dépôt GitHub :} {\normalsize\afficherlien}}\par
+  \vfill
+  {\large Année universitaire 2026-2027}\par
+  \vspace{0.2cm}
+  Remis le \today
+\end{titlepage}
+
+% =====================================================================
+\section{Introduction}
+\label{sec:introduction}
+% 8 à 12 lignes. Elle reprend la cellule d'en-tête du notebook.
+% =====================================================================
+\paragraph{Contexte.} Entre 2008 et 2010, une banque portugaise a proposé des dépôts à terme par téléphone. Seuls 11,7\,\% des contacts ont abouti. Un score calculé avant l'appel pourrait aider les responsables de campagne à prioriser les clients et à mieux répartir les appels.
+
+\paragraph{Problématique.} Avec les informations disponibles avant l'appel, peut-on classer les clients selon leur probabilité de souscrire mieux qu'une règle fondée sur le succès d'une campagne précédente ?
+
+\paragraph{Objectif mesurable.} Sur les 20\,\% d'appels les plus récents, obtenir une AP supérieure d'au moins 10\,\% en relatif à la meilleure référence naïve, la règle « succès précédent ».
+
+\paragraph{Nature du problème.} classification binaire supervisée déséquilibrée : la cible vaut « oui » pour 11,7\,\% des contacts ; l'AP évalue le classement de la classe positive.
+
+\paragraph{Organisation du rapport.} La section~\ref{sec:etat} présente l'état de l'art et la section~\ref{sec:travaux} les travaux liés. Les sections~\ref{sec:donnees} à~\ref{sec:protocole} décrivent les données, leur exploration, leur préparation, l'algorithme retenu et le protocole expérimental. La section~\ref{sec:resultats} présente les résultats, discutés en section~\ref{sec:discussion}, avant la conclusion (section~\ref{sec:conclusion}).
+
+% =====================================================================
+\section{État de l'art}
+\label{sec:etat}
+% 6 à 10 lignes et le tableau. L'état de l'art présente les GRANDES
+% FAMILLES de méthodes utilisées pour ce type de problème (approches
+% statistiques ou économétriques classiques, apprentissage automatique,
+% référence naïve habituelle du domaine), avec leurs atouts et limites.
+% Chaque affirmation est appuyée par une citation \cite{...}.
+% =====================================================================
+La réponse à une campagne se traite comme un problème de scoring : on classe les clients afin de prioriser les appels. La régression logistique fournit un score interprétable, tandis que les arbres et le gradient boosting modélisent des non-linéarités et interactions. Les règles fondées sur l'historique sont des références simples, mais ne couvrent pas les clients sans historique. Dans un contexte déséquilibré, l'aire précision-rappel est plus informative pour la classe positive ; une validation chronologique révèle aussi la dérive temporelle \cite{etat1}.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Panorama des approches pour ce type de problème}
+  \label{tab:etat}
+  \small
+  \begin{tabular}{@{}P{3cm} P{4.3cm} P{3.5cm} P{3.5cm} l@{}}
+    \toprule
+    Approche & Principe & Atouts & Limites & Réf. \\
+    \midrule
+    Règle métier & Appeler en priorité les clients dont une campagne antérieure a réussi & Simple, explicable & Ne couvre pas la majorité sans historique & \cite{etat1} \\
+    Régression logistique & Estimer une probabilité par combinaison linéaire des variables & Interprétable, robuste & Effets linéaires sur la log-cote & \cite{etat1} \\
+    Gradient boosting d'arbres & Ajouter des arbres successifs qui corrigent les erreurs du modèle courant & Capte non-linéarités et interactions & Moins interprétable, réglages nécessaires & \cite{etat1} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% =====================================================================
+\section{Travaux liés}
+\label{sec:travaux}
+% Deux ou trois ÉTUDES PRÉCISES qui traitent un problème proche du vôtre
+% (même question, mêmes données ou même méthode). Pour chacune : données,
+% méthode, résultat principal, et ce qui distingue votre travail.
+% =====================================================================
+\begin{table}[htbp]
+  \centering
+  \caption{Travaux liés}
+  \label{tab:travaux}
+  \small
+  \begin{tabular}{@{}P{2.4cm} P{2.8cm} P{2.8cm} P{3.4cm} P{3.8cm}@{}}
+    \toprule
+    Travail & Données & Méthode & Résultat principal & Différence avec ce travail \\
+    \midrule
+    Moro et al., 2011 \cite{lie1} & 45\,211 contacts, 2008--2010, 29 variables & Bayes naïf, arbre et SVM ; partitions aléatoires répétées & SVM : AUC 0,938 ; durée d'appel très influente & Durée exclue car connue après l'appel ; test chronologique \\
+    Moro et al., 2014 \cite{lie2} & 45\,211 contacts, 2008--2010, 29 variables & Bayes naïf, arbre et SVM ; partitions aléatoires répétées & SVM : AUC 0,938 ; durée d'appel très influente & Durée exclue car connue après l'appel ; test chronologique \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Positionnement.} L'étude reprend la prédiction de souscription, mais écarte la durée d'appel et évalue le modèle sur une période ultérieure. Elle compare le gradient boosting à une référence métier et à la régression logistique avec un jeu plus réduit.
+
+% =====================================================================
+\section{Jeu de données}
+\label{sec:donnees}
+% =====================================================================
+\begin{itemize}
+  \item \textbf{Nom et source :} Bank Marketing, UCI Machine Learning Repository, jeu n° 222, fichier \texttt{bank-full.csv} \cite{donnees}, \url{https://archive.ics.uci.edu/dataset/222/bank+marketing}
+  \item \textbf{Date d'extraction :} 24/11/2026
+  \item \textbf{Licence ou conditions d'utilisation :} CC BY 4.0
+  \item \textbf{Taille :} 45\,211 observations et 16 variables, de mai 2008 à novembre 2010, fréquence par contact, dans l'ordre chronologique
+  \item \textbf{Unité d'observation :} un client contacté lors d'une campagne de télémarketing
+  \item \textbf{Variable cible :} \texttt{y}, souscription oui/non
+  \item \textbf{Adéquation :} les variables client et contacts antérieurs sont disponibles avant l'appel, et l'ordre des lignes permet un test sur les contacts les plus récents
+  \item \textbf{Limites :} une banque et une période de crise ; année absente ; classe positive déséquilibrée ; modalités \texttt{unknown} fréquentes ; taux de souscription variable dans le temps
+\end{itemize}
+
+% Cinq à huit variables suffisent. Ajoutez ou retirez des lignes.
+% Les variables que vous créez figurent aussi ici, avec leur formule.
+\begin{table}[htbp]
+  \centering
+  \caption{Dictionnaire des principales variables}
+  \label{tab:dictionnaire}
+  \small
+  \begin{tabular}{@{}l P{5.6cm} l l l c@{}}
+    \toprule
+    Variable & Description & Type & Unité & Rôle & Manquants (\%) \\
+    \midrule
+    \texttt{y} & Souscription du dépôt à terme & binaire & — & cible & 0 \\
+    \texttt{poutcome} & Résultat de la campagne précédente & catégorielle & — & explicative & 81,7\,\% (unknown) \\
+    \texttt{contact} & Canal du dernier contact & catégorielle & — & explicative & 28,8\,\% (unknown) \\
+    \texttt{balance} & Solde annuel moyen & numérique & euros & explicative & 0 \\
+    \texttt{month} & Mois du dernier contact & catégorielle & mois & date & 0 \\
+    \texttt{deja\_contacte} & 1 si \texttt{pdays} $\ne -1$ & binaire & — & explicative & 0 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% =====================================================================
+\section{Exploration}
+\label{sec:exploration}
+% =====================================================================
+\paragraph{Statistiques descriptives.} Le taux de souscription global est de 11,7\,\%. L'âge moyen est 40,9 ans (écart-type 10,6 ; étendue 18--95). Le solde moyen est 1\,362,3 euros (écart-type 3\,044,8 ; min. -8\,019 ; max. 102\,127). La campagne comporte 2,8 appels en moyenne (maximum 63).
+
+\paragraph{Qualité des données.} Aucun doublon ni NaN. Les absences sont codées \texttt{unknown} (81,7\,\% pour \texttt{poutcome}, 28,8\,\% pour \texttt{contact}, 4,1\,\% pour \texttt{education}, 0,6\,\% pour \texttt{job}) et conservées comme information. Les soldes négatifs (8,3\,\%) et les 63 appels maximum sont plausibles ; aucune valeur extrême n'est supprimée.
+
+\insererfigure{fig1_description.png}{Taux de souscription par décile chronologique}{fig:1}
+
+\noindent\textbf{Lecture de la figure~\ref{fig:1}.} Le taux passe de 3,0\,\% dans le premier décile à 47,1\,\% dans le dernier. Les périodes sont très différentes ; le découpage doit donc respecter l'ordre chronologique.
+
+\insererfigure{fig2_description.png}{Taux de souscription selon le résultat de la campagne précédente}{fig:2}
+
+\noindent\textbf{Lecture de la figure~\ref{fig:2}.} Les clients dont la campagne précédente a réussi souscrivent à 64,7\,\%, contre 9,2\,\% pour ceux sans historique. C'est un signal fort, mais il ne concerne que 1\,511 clients.
+
+% =====================================================================
+\section{Préparation}
+\label{sec:preparation}
+% =====================================================================
+\begin{itemize}
+  \item \textbf{Nettoyage :} Aucune ligne supprimée ; modalités \texttt{unknown} conservées ; valeurs extrêmes plausibles conservées ; \texttt{duration} retirée pour éviter une fuite après l'appel.
+  \item \textbf{Variables créées :} Création de \texttt{deja\_contacte}, égal à 1 si \texttt{pdays} diffère de -1 ; aucune autre variable temporelle dérivée.
+  \item \textbf{Encodage et mise à l'échelle :} Les variables catégorielles sont encodées pour les arbres ; aucune standardisation n'est nécessaire. La régression logistique utilise un encodage one-hot et une standardisation dans un pipeline.
+\end{itemize}
+
+\paragraph{Prévention des fuites.}
+% Cochez en remplaçant $\square$ par $\boxtimes$. Rayez ce qui ne s'applique pas à votre sujet.
+\begin{itemize}
+  \item[$\boxtimes$] Transformations ajustées sur l'apprentissage seulement, dans un \texttt{Pipeline}.
+  \item[$\boxtimes$] Découpage chronologique, sans mélange (données datées).
+  \item[$\boxtimes$] Variables construites avec le passé seulement ; écart de $h$ observations si la cible porte sur un horizon $h$.
+  \item[$\boxtimes$] Aucune variable ne contient la cible, même indirectement.
+  \item[$\boxtimes$] Jeu de test utilisé une seule fois, à la fin.
+\end{itemize}
+Les rangs 36\,167 à 36\,170 ont été affichés autour de la coupure : le test commence au rang 36\,169, immédiatement après les données d'apprentissage, sans mélange des lignes.
+
+% =====================================================================
+\section{Algorithme}
+\label{sec:algorithme}
+% 6 à 10 lignes pour le principe.
+% =====================================================================
+\paragraph{Choix.} Algorithme 14 du support : \texttt{HistGradientBoostingClassifier}. Il capture des non-linéarités et interactions ; la régression logistique (n° 8) est gardée comme comparaison plus simple.
+
+\paragraph{Principe.} Le modèle part d'un score initial puis ajoute $M$ arbres peu profonds ; chaque arbre apprend à corriger le gradient négatif de la perte logistique. Les sorties des arbres sont pondérées par le taux d'apprentissage $\eta$ et converties en probabilité par la fonction logistique \cite{sklearn}.
+
+\paragraph{Formule essentielle.}
+% Remplacez la formule rouge par celle de votre algorithme, par exemple
+% \hat{y} = \beta_0 + \sum_{j=1}^{p} \beta_j x_j   (régression linéaire)
+\begin{equation}
+  {\color{red} \hat{y} = f(x_1, \dots, x_p)}
+  \label{eq:principale}
+\end{equation}
+où $x$ désigne les variables d'un client, $h_m$ le $m$-ième arbre, $F_0$ le score initial, $\eta$ le taux d'apprentissage, $M=200$ le nombre d'arbres et $\hat p(x)$ la probabilité estimée de souscrire..
+
+\paragraph{Paramètres appris.} La structure des arbres (variables, seuils et regroupements de modalités) ainsi que la valeur de chaque feuille.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Hyperparamètres étudiés}
+  \label{tab:hyper}
+  \small
+  \begin{tabular}{@{}l P{6.4cm} l l@{}}
+    \toprule
+    Hyperparamètre & Rôle et effet attendu & Valeurs testées & Valeur retenue \\
+    \midrule
+    \texttt{learning\_rate} & Poids des arbres : un taux plus faible donne un apprentissage progressif & 0,03 ; 0,1 ; 0,3 & 0,03 \\
+    \texttt{max\_leaf\_nodes} & Nombre de feuilles : une complexité élevée augmente le risque de surapprentissage & 7 ; 15 ; 31 & 7 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% =====================================================================
+\section{Protocole expérimental}
+\label{sec:protocole}
+% =====================================================================
+\begin{table}[htbp]
+  \centering
+  \caption{Découpage des données}
+  \label{tab:decoupage}
+  \small
+  \begin{tabular}{@{}l l r@{}}
+    \toprule
+    Ensemble & Période ou proportion & Observations \\
+    \midrule
+    Apprentissage & rangs 0--36\,168 & 36\,169 \\
+    Validation & TimeSeriesSplit, 4 plis dans l'apprentissage & 28\,932 (4 plis) \\
+    Test & rangs 36\,169--45\,210 & 9\,042 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{itemize}
+  \item \textbf{Référence naïve :} Score 1 si \texttt{poutcome=success}, sinon 0 ; ce signal est disponible avant l'appel et constitue une règle métier explicable.
+  \item \textbf{Validation :} Validation chronologique \texttt{TimeSeriesSplit}, 4 plis ; 9 configurations de gradient boosting évaluées.
+  \item \textbf{Métrique principale :} AP (aire précision-rappel), sans unité ; elle évalue le classement des souscripteurs dans une cible déséquilibrée.
+  \item \textbf{Métriques secondaires :} AUC ROC et rappel parmi les 20\,\% de clients les mieux classés.
+  \item \textbf{Graine aléatoire :} 42.
+\end{itemize}
+
+% =====================================================================
+\section{Résultats}
+\label{sec:resultats}
+% Les FAITS : chiffres, figure, erreurs. Leur interprétation va dans
+% la section Discussion des résultats.
+% =====================================================================
+% En non supervisé ou en renforcement, adaptez les colonnes (silhouette,
+% variance expliquée, rendement, ratio de Sharpe, perte maximale...),
+% selon la section 3.3 de l'énoncé.
+\begin{table}[htbp]
+  \centering
+  \caption{Comparaison de la référence naïve et du modèle}
+  \label{tab:resultats}
+  \small
+  \begin{tabular}{@{}l cc cc@{}}
+    \toprule
+    & \multicolumn{2}{c}{AP} & \multicolumn{2}{c}{AUC ROC} \\
+    \cmidrule(lr){2-3}\cmidrule(lr){4-5}
+    Modèle & Validation & Test & Validation & Test \\
+    \midrule
+    Référence : succès précédent & 0,082 $\pm$ 0,044 & 0,436 & 0,508 $\pm$ 0,012 & 0,626 \\
+    Gradient boosting & 0,088 $\pm$ 0,044 & 0,485 & 0,545 $\pm$ 0,027 & 0,706 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\insererfigure{fig3_description.png}{Courbes précision-rappel sur la période de test}{fig:3}
+
+\paragraph{Lecture des résultats.} Sur le test, l'AP passe de 0,436 pour la règle à 0,485 pour le gradient boosting, soit +11,3\,\% en relatif : l'objectif de +10\,\% est atteint. La logistique obtient une AP de 0,489 ; le gradient boosting a une AUC de 0,706. Au rappel de 31,7\,\% de la règle, sa précision (69,5\,\%) dépasse celle du gradient boosting (52,9\,\%).
+
+\paragraph{Analyse des erreurs.} Parmi les 1\,808 clients les mieux classés, 970 souscrivent (précision 53,7\,\%, rappel 34,0\,\%) et 1\,886 souscripteurs sont manqués. L'AP est de 0,322 dans la première moitié du test et 0,529 dans la seconde ; le modèle dépend surtout de \texttt{poutcome}.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Prédictions sur des observations non utilisées pour l'apprentissage}
+  \label{tab:illustration}
+  \small
+  \begin{tabular}{@{}l l l P{7cm}@{}}
+    \toprule
+    Observation & Prédiction & Valeur réelle & Commentaire \\
+    \midrule
+    Rang 41740 & 0,894 & oui & Succès passé, score élevé ; souscription correctement classée. \\
+    Rang 44312 & 0,097 & oui & Succès passé mais score faible ; le client souscrit malgré tout. \\
+    Rang 41719 & 0,867 & non & Score élevé sans historique ; faux positif. \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% =====================================================================
+\section{Discussion des résultats}
+\label{sec:discussion}
+% 8 à 12 lignes : ce que les résultats veulent dire, et leurs limites.
+% =====================================================================
+\paragraph{Réponse à l'objectif.} L'objectif fixé dans l'introduction est atteint de peu, car l'AP test est 0,485 contre 0,436 pour la meilleure règle, soit +11,3\,\% en relatif (seuil : +10\,\%).
+
+\paragraph{Interprétation.} Le modèle améliore le classement global, surtout pour les clients sans succès passé. Les variables les plus influentes par permutation sont \texttt{poutcome} (baisse d'AP 0,086) et \texttt{month} (0,058) ; ce sont des associations, pas des causes.
+
+\paragraph{Surapprentissage et généralisation.} L'AUC passe de 0,740 sur l'apprentissage à 0,706 sur le test. La dérive temporelle est plus préoccupante : taux positif de 6,7\,\% à l'apprentissage contre 31,6\,\% au test, AP 0,322 puis 0,529 entre moitiés du test.
+
+\paragraph{Comparaison avec les travaux liés.} Les scores sont inférieurs à ceux de Moro et al. : la durée d'appel est exclue car indisponible avant décision, le découpage est chronologique et le jeu contient moins de variables. Les protocoles ne sont pas directement comparables.
+
+\paragraph{Limites et biais.} Une seule banque et une période historique marquée par la crise ; l'année manque dans les données ; le résultat change fortement dans le temps et l'historique de campagne est inconnu pour 81,7\,\% des clients. Une seule période de test limite la généralisation.
+
+\paragraph{Pistes d'amélioration.} Prioriser d'abord les succès antérieurs puis classer les autres clients ; réentraîner sur une fenêtre glissante avec des variables économiques complémentaires et recalibrer les probabilités.
+
+% =====================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+% 4 à 6 lignes : réponse directe à la problématique, apport, perspective.
+% =====================================================================
+Le gradient boosting classe les clients avec une AP test de 0,485 contre 0,436 pour la règle métier, dépassant de peu l'objectif. Il ne dépasse pas la logistique en AP et la règle reste plus précise sur son groupe. L'évaluation chronologique montre que la dérive temporelle doit guider toute utilisation future.
+
+% =====================================================================
+%  RÉFÉRENCES ET CITATIONS
+%  Format : Auteur(s), « titre », revue ou éditeur, volume, pages, année.
+%  Pour une page web : organisme, titre, URL, date de consultation.
+%  Chaque référence doit être citée au moins une fois dans le texte.
+% =====================================================================
+\begin{thebibliography}{9}
+  \bibitem{donnees} UCI Machine Learning Repository, « Bank Marketing », jeu n° 222, licence CC BY 4.0, \url{https://archive.ics.uci.edu/dataset/222/bank+marketing}, consulté le 24/11/2026.
+  \bibitem{etat1} S. Moro, R. Laureano, P. Cortez, « Using Data Mining for Bank Direct Marketing: An Application of the CRISP-DM Methodology », ESM'2011, p. 117--121, 2011.
+  \bibitem{lie1} S. Moro, R. Laureano, P. Cortez, « Using Data Mining for Bank Direct Marketing », ESM'2011, 2011.
+  \bibitem{lie2} S. Moro, P. Cortez, P. Rita, « A data-driven approach to predict the success of bank telemarketing », \textit{Decision Support Systems}, vol. 62, p. 22--31, 2014, DOI 10.1016/j.dss.2014.03.001.
+  \bibitem{sklearn} F.~Pedregosa \textit{et al.}, « Scikit-learn: Machine Learning in Python », \textit{Journal of Machine Learning Research}, vol.~12, p.~2825-2830, 2011.
+  \bibitem{support} Support du cours BD \& DS, notebook \texttt{Tp\_ML.ipynb}, ENCG-2026.
+\end{thebibliography}
+
+% =====================================================================
+%  ANNEXES
+% =====================================================================
+\appendix
+
+\section{Reproduction}
+\label{ann:reproduction}
+Version corrigée : étiquette \texttt{remise-finale} du dépôt \afficherlien.
+\begin{enumerate}
+  \item Cloner le dépôt : \texttt{git clone} suivi du lien ci-dessus.
+  \item Installer les dépendances : \texttt{pip install -r requirements.txt}.
+  \item Exécuter \texttt{notebooks/Etude\_de\_cas\_UCI222\_marketing\_bancaire.ipynb} avec « Redémarrer et tout exécuter ».
+\end{enumerate}
+
+\section{Tableaux et figures complémentaires}
+\label{ann:complements}
+% Facultatif : résultats détaillés, figures supplémentaires, matrice de
+% confusion complète, courbe de validation. Supprimez cette annexe si
+% elle reste vide.
+Les diagnostics détaillés, les autres figures et les sorties chiffrées sont fournis dans le notebook joint.
+
+\section{Déclaration des outils d'IA}
+\label{ann:ia}
+% Reprend le fichier DECLARATION_IA.md du dépôt.
+\begin{table}[htbp]
+  \centering
+  \caption{Ressources et outils d'IA utilisés}
+  \label{tab:ia}
+  \small
+  \begin{tabular}{@{}P{3cm} P{4.8cm} P{3.3cm} P{4.4cm}@{}}
+    \toprule
+    Outil ou ressource & Usage précis & Parties concernées & Vérification effectuée \\
+    \midrule
+    Notebook de référence : Claude (24/11/2026) ; rédaction : Codex (24/11/2026) & Analyse et rédaction de l'exemple de notebook ; mise en forme du rapport à partir des résultats fournis & Notebook complet ; rapport & Résultats comparés aux sorties enregistrées du notebook ; source UCI et référence 2014 vérifiées \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+Déclaration applicable : outils ci-dessus ; vérifier les consignes de l'enseignant.
+
+\end{document}
